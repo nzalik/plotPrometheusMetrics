@@ -1,35 +1,53 @@
+import requests
+import configparser
 import json
-
 import matplotlib.pyplot as plt
 
-# Les données fournies
-data = {
-    'status': 'success',
-    'data': {
-        'resultType': 'vector',
-        'result': [
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-auth'}, 'value': [1712925428.169, '74.64022']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-db'}, 'value': [1712925428.169, '8.624465']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-image'}, 'value': [1712925428.169, '60.117853']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-persistence'}, 'value': [1712925428.169, '32.657405']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-recommender'}, 'value': [1712925428.169, '62.560744']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-registry'}, 'value': [1712925428.169, '14.938629']},
-            {'metric': {'__name__': 'container_cpu_usage_seconds_total', 'container': 'teastore-webui'}, 'value': [1712925428.169, '102.531033']}
-        ]
-    }
-}
+# Lire le fichier de configuration
+config = configparser.ConfigParser()
+config.read('config.ini')
+
+prometheus_url = "http://172.16.192.22:32213/api/v1/query?query="
+
+# Créer un dictionnaire pour stocker les réponses
+responses = {}
+
+# Obtenir la section 'requetes' du fichier de configuration
+requetes_section = config['requetes']
+
+# Parcourir toutes les clés de la section 'requetes' et effectuer les requêtes
+for key in requetes_section:
+    url = requetes_section[key]
+    print("Requête pour :", key)
+
+    # Effectuer la requête GET
+    response = requests.get(prometheus_url+url)
+
+    # Vérifier si la requête a réussi (code 200)
+    if response.status_code == 200:
+        # Ajouter la réponse au dictionnaire avec la clé correspondante
+        responses[key] = json.loads(response.text)
+        print("La requête a réussi.")
+    else:
+        # Si la requête a échoué, afficher le code d'erreur
+        print("La requête a échoué avec le code :", response.status_code)
+    print("\n")  # Ajouter une ligne vide entre les requêtes
+
 
 x_values = []
 y_values = []
 container_names = []
 
+data = responses['requete1']
+
 # Extraction des valeurs pour les axes X et Y et les noms des conteneurs
 for item in data['data']['result']:
-    # Sélectionner les valeurs de temps (axe X) et de valeur (axe Y)
-    x_values.append(float(item["value"][0]))  # Valeur en première position
-    y_values.append(float(item["value"][1]))  # Valeur en deuxième position
-    # Ajouter le nom du conteneur
-    container_names.append(item["metric"]["container"])
+    if "metric" in item and "container" in item["metric"]:
+        # Sélectionner les valeurs de temps (axe X) et de valeur (axe Y)
+        x_values.append(float(item["value"][0]))  # Valeur en première position
+        y_values.append(float(item["value"][1]))  # Valeur en deuxième position
+        # Ajouter le nom du conteneur
+        container_names.append(item["metric"]["container"])
 
 # Création du tracé en assignant une couleur différente à chaque conteneur
 for i in range(len(x_values)):
