@@ -4,6 +4,19 @@ import json
 import matplotlib.pyplot as plt
 import time
 
+# Function to write response data to a file
+def write_to_file(response_data):
+    with open('response_data.txt', 'a') as file:
+        file.write(json.dumps(response_data) + '\n')
+
+# Function to read response data from file
+def read_from_file():
+    response_data = []
+    with open('response_data.txt', 'r') as file:
+        for line in file:
+            response_data.append(json.loads(line))
+    return response_data
+
 while True:
     # Lire le fichier de configuration
     config = configparser.ConfigParser()
@@ -24,32 +37,36 @@ while True:
 
         # Effectuer la requête GET
         response = requests.get(prometheus_url + url)
-        print("request url :", prometheus_url + url)
 
         # Vérifier si la requête a réussi (code 200)
         if response.status_code == 200:
             # Ajouter la réponse au dictionnaire avec la clé correspondante
             responses[key] = json.loads(response.text)
             print("La requête a réussi.")
+            # Écrire les données de réponse dans un fichier
+            write_to_file(responses[key])
         else:
             # Si la requête a échoué, afficher le code d'erreur
             print("La requête a échoué avec le code :", response.status_code)
         print("\n")  # Ajouter une ligne vide entre les requêtes
 
+    # Lire les données de réponse à partir du fichier
+    response_data = read_from_file()
+
+    # Préparation des données pour le tracé
     x_values = []
     y_values = []
     container_names = []
 
-    data = responses['requete1']
-
-    # Extraction des valeurs pour les axes X et Y et les noms des conteneurs
-    for item in data['data']['result']:
-        if "metric" in item and "container" in item["metric"]:
-            # Sélectionner les valeurs de temps (axe X) et de valeur (axe Y)
-            x_values.append(float(item["value"][0]))  # Valeur en première position
-            y_values.append(float(item["value"][1]))  # Valeur en deuxième position
-            # Ajouter le nom du conteneur
-            container_names.append(item["metric"]["container"])
+    for data in response_data:
+        # Extraction des valeurs pour les axes X et Y et les noms des conteneurs
+        for item in data['data']['result']:
+            if "metric" in item and "container" in item["metric"]:
+                # Sélectionner les valeurs de temps (axe X) et de valeur (axe Y)
+                x_values.append(float(item["value"][0]))  # Valeur en première position
+                y_values.append(float(item["value"][1]))  # Valeur en deuxième position
+                # Ajouter le nom du conteneur
+                container_names.append(item["metric"]["container"])
 
     # Création du tracé en assignant une couleur différente à chaque conteneur
     plt.figure()
