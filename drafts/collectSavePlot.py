@@ -22,7 +22,7 @@ while True:
     config = configparser.ConfigParser()
     config.read('config.ini')
 
-    prometheus_url = "http://172.16.192.21:32431/api/v1/query?query="
+    prometheus_url = "http://172.16.192.6:30512/api/v1/query?query="
 
     # Créer un dictionnaire pour stocker les réponses
     responses = {}

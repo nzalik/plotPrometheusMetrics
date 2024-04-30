@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import os
 import matplotlib.pyplot as plt
 import time
-prom_url = "http://172.16.192.8:30959"
+prom_url = "http://172.16.192.6:31775"
 
 def query_prometheus(query):
     url = prom_url + '/api/v1/' + query
@@ -57,7 +57,7 @@ print(all_services)
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-prometheus_url = "http://172.16.192.8:30959/api/v1/query?query="
+prometheus_url = "http://172.16.192.6:31775/api/v1/query?query="
 
 # Créer un dictionnaire pour stocker les réponses
 responses = {}
@@ -94,7 +94,7 @@ for svc in all_services:
     current_time = datetime.now()
 
     # Subtract 10 minutes
-    new_time = current_time - timedelta(minutes=10)
+    new_time = current_time - timedelta(minutes=20)
 
     # Convert the result to a timestamp
     new_timestamp = new_time.timestamp()
@@ -121,7 +121,7 @@ for svc in all_services:
     print("Querying " + url + " with payload " + str(payload))
 
     res = None
-    directory = "./data/memory"
+    directory = "../data/memory"
     filename = svc + '.json'
     query_str_file = os.path.join(directory, filename)
     #query_str_file = "nom_du_fichier.json"

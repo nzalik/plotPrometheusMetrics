@@ -1,6 +1,8 @@
 import json
 import matplotlib.pyplot as plt
 import datetime
+import re
+
 
 # Définir une fonction pour lire et traiter chaque fichier JSON
 def plot_json(file_name):
@@ -14,35 +16,36 @@ def plot_json(file_name):
 
     return dates, valeurs
 
+
 # Liste des noms de fichiers JSON à lire et tracer
 #json_files = ['container_receive_bytes_usage_bytes.json', 'container_receive_bytes_usage_bytes2.json']
 json_files = [
-              #   './receive_bytes/container_receive_bytes_max_usage_bytes_li1_teaauth.json',
-              # './receive_bytes/container_receive_bytes_max_usage_bytes_li1_teadb.json',
-              # './receive_bytes/container_receive_bytes_max_usage_bytes_li1_teaimg.json',
-              #'./receive_bytes/container_receive_bytes_max_usage_bytes_li1_tearecom.json',
-              # './receive_bytes/container_receive_bytes_max_usage_bytes_li1_teaui.json',
-               '../data/receive_bytes/teastore-recommender-6b67599fb9-gsr8s.json',
-               '../data/receive_bytes/teastore-persistence-7d6bcb6b96-ltlf8.json',
-               '../data/receive_bytes/teastore-webui-59f448d7f5-kvj5z.json',
-               '../data/receive_bytes/teastore-registry-69c86867cd-qrd98.json',
-               '../data/receive_bytes/teastore-image-6b9796d7c7-pqvvq.json',
-               '../data/receive_bytes/teastore-db-7685d7b587-xc96b.json',
-               '../data/receive_bytes/teastore-auth-8877cbcc9-287j7.json',
-              ]
+    '../data2/network/teastore-webui-59f448d7f5-8z9cs.json',
+    '../data2/network/teastore-registry-69c86867cd-mxccl.json',
+    '../data2/network/teastore-recommender-6b67599fb9-7g8qv.json',
+    '../data2/network/teastore-persistence-7d6bcb6b96-jcl4d.json',
+    '../data2/network/teastore-image-6b9796d7c7-tsq8h.json',
+    '../data2/network/teastore-db-7685d7b587-bl4vl.json',
+    '../data2/network/teastore-auth-8877cbcc9-5k2jz.json'
+]
 
 # Tracer chaque jeu de données JSON
 for file_name in json_files:
+    file_parts = file_name.split("/")
+    last_part = (file_parts[-1]).split(".")[0]
+    result = re.split(r'-\d+', last_part)[0]
     dates, valeurs = plot_json(file_name)
-    plt.plot(dates, valeurs, label=file_name)
+    plt.plot(dates, valeurs, label=result)
 
 # Ajouter des titres et libellés aux axes
-plt.title('Container receive_bytes usage ')
-plt.xlabel('Date')
-plt.ylabel('cores')
+#plt.title('Container receive_bytes usage ')
+plt.xlabel('Time(s)')
+plt.ylabel('Received bytes')
 
 # Ajouter une légende pour les différentes lignes
-plt.legend()
+plt.legend(bbox_to_anchor=(-.14, 1.02, 1.27, .102), loc='lower left',
+           ncols=4, mode="expand", borderaxespad=0.)
 
 # Afficher le graphique
+plt.savefig('receivedbyteswithoutload.png')
 plt.show()

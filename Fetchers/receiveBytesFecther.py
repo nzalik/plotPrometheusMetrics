@@ -63,7 +63,7 @@ prometheus_url = "http://172.16.192.8:30959/api/v1/query?query="
 responses = {}
 
 # Obtenir la section 'requetes' du fichier de configuration
-requetes_section = config['requetes']
+#requetes_section = config['requetes']
 
 # Parcourir toutes les clés de la section 'requetes' et effectuer les requêtes
 # for key in requetes_section:
@@ -94,7 +94,7 @@ for svc in all_services:
     current_time = datetime.now()
 
     # Subtract 10 minutes
-    new_time = current_time - timedelta(minutes=10)
+    new_time = current_time - timedelta(minutes=60)
 
     # Convert the result to a timestamp
     new_timestamp = new_time.timestamp()
@@ -108,7 +108,7 @@ for svc in all_services:
     end_at = '1713929699.433031'
     #container_name = "teastore-webui-59f448d7f5-jqx57"
 
-    query_str = f"sum(irate(container_network_receive_bytes_total{{pod=\"{container_name}\"}}[5m]))/1"
+    query_str = f"sum(irate(container_network_receive_bytes_total{{pod=\"{container_name}\"}}[3h]))/1"
 
     #query_str = "sum(irate(container_cpu_usage_seconds_total{pod=\"teastore-webui-59f448d7f5-jqx57\"}[5m]))/1"
 
@@ -121,7 +121,7 @@ for svc in all_services:
     print("Querying " + url + " with payload " + str(payload))
 
     res = None
-    directory = "./data/receive_bytes"
+    directory = "../data/receive_bytes"
     filename = svc + '.json'
     query_str_file = os.path.join(directory, filename)
     #query_str_file = "nom_du_fichier.json"
