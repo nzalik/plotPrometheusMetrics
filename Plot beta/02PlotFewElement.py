@@ -141,7 +141,6 @@ ticks2 = np.arange(start_time2, end_time2 + 1, 20)
 
 # Set ticks on the x-axis
 ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks]
-#print(ticks_seconds2)
 plt.xticks(ticks2, ticks_seconds2)
 plt.xlabel('Time (seconds)')
 plt.ylabel('Memory (Gbytes)')
@@ -151,10 +150,26 @@ plt.xticks(rotation=45)
 plt.legend()
 
 plt.subplot(4, 1, 3)
+print("ticks_seconds2")
+print(ticks_seconds2)
+resultat = ticks_seconds2[3:]
+print("#############")
+print("resultat")
+print(resultat)
+
 df = pd.read_csv('output020524-22.csv')
+nombre_lignes = len(df)
+print("nombre_lignes")
+print(nombre_lignes)
 plt.plot(df['Target Time'], df['Load Intensity'])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of requests')
+# Ajouter les valeurs supplémentaires sur l'axe X
+x_values = [140, 160, 180]
+plt.xticks(x_values + list(df['Target Time']))
+
+# Ajouter la valeur 0 sur l'axe Y
+plt.yticks([0] + list(df['Load Intensity']))
 
 plt.subplot(4, 1, 4)
 # Read JSON data from a file

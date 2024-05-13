@@ -46,6 +46,7 @@ def query_svc_names(namespace='default'):
     res = query_prometheus(query_str)
     svc_names = []
     services = res['data']
+    print(services)
     # if res != None:
     #     svc_names = res['data']
     #     for name in svc_names:
@@ -88,7 +89,7 @@ def _init_metric_metadata(metric):
         print(metadata)
 
         if (metadata['type'] == "gauge"):
-            return f"sum({metric}{{pod=\"{container_name}\"}})/1"
+            return f"{metric}{{pod=\"{container_name}\"}}"
         else:
             return f"sum(irate({metric}{{pod=\"{container_name}\"}}[10m]))/1"
 
@@ -118,7 +119,7 @@ requetes_section = config['requetes']
 # Parcourir toutes les clés de la section 'requetes' et effectuer les requêtes
 
 for section_name in config.sections():
-    print("Section:", section_name)
+
     for key, value in config.items(section_name):
         for svc in all_services:
 
@@ -127,7 +128,7 @@ for section_name in config.sections():
             current_time = datetime.now()
 
             # Subtract 10 minutes
-            new_time = current_time - timedelta(minutes=10)
+            new_time = current_time - timedelta(minutes=25)
 
             # Convert the result to a timestamp
             new_timestamp = new_time.timestamp()
@@ -160,3 +161,37 @@ for section_name in config.sections():
             except Exception as e:
                 print(e)
                 print("...Fail at Prometheus request.")
+
+
+current_timestamp = datetime.now().timestamp()
+
+current_time = datetime.now()
+
+# Subtract 10 minutes
+new_time = current_time - timedelta(minutes=15)
+
+# Convert the result to a timestamp
+new_timestamp = new_time.timestamp()
+
+step = parameters['STEP']
+container_name = "pod_info"
+
+url = prom_url + '/api/v1/query?query=count(kube_pod_info{namespace="default"})'
+
+res = None
+directory = "../data/pod_info"
+filename = container_name + '.json'
+query_str_file = os.path.join(directory, filename)
+#query_str_file = "nom_du_fichier.json"
+os.makedirs(directory, exist_ok=True)
+# Query Prometheus
+try:
+    res = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
+    print("la reponse pour les pods")
+    print(res)
+    with open(query_str_file, 'a') as f:
+        json.dump(res, f, ensure_ascii=False)
+
+except Exception as e:
+    print(e)
+    print("...Fail at Prometheus request.")

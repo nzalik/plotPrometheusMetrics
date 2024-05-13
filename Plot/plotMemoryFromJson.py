@@ -25,13 +25,13 @@ json_files = [
               #'./memory/container_memory_max_usage_bytes_li1_tearecom.json',
               # './memory/container_memory_max_usage_bytes_li1_teaui.json',
 
-    '../data2/memory/teastore-webui-59f448d7f5-8z9cs.json',
-    '../data2/memory/teastore-registry-69c86867cd-mxccl.json',
-    '../data2/memory/teastore-recommender-6b67599fb9-7g8qv.json',
-    '../data2/memory/teastore-persistence-7d6bcb6b96-jcl4d.json',
-    '../data2/memory/teastore-image-6b9796d7c7-tsq8h.json',
-    '../data2/memory/teastore-db-7685d7b587-bl4vl.json',
-    '../data2/memory/teastore-auth-8877cbcc9-5k2jz.json'
+    '../data/memory/teastore-webui-59f448d7f5-cmhdv.json',
+    '../data/memory/teastore-registry-69c86867cd-l7c7q.json',
+    '../data/memory/teastore-recommender-6b67599fb9-vqj6x.json',
+    '../data/memory/teastore-persistence-7d6bcb6b96-w9tg4.json',
+    '../data/memory/teastore-image-6b9796d7c7-wlhnt.json',
+    '../data/memory/teastore-db-7685d7b587-6bxzn.json',
+    '../data/memory/teastore-auth-8877cbcc9-rmt4s.json'
               ]
 
 # Tracer chaque jeu de données JSON
