@@ -48,10 +48,6 @@ def plot_json(file_name, label):
     datas = json_data['data']['result'][0]['values']
 
     timestamps = np.array([int(ts) for ts, _ in datas])
-    print("non lisser")
-    print(len(timestamps))
-    print("###########")
-    print("lisser")
 
     given_value = 1714664577.325  # Replace with your desired value
 
@@ -68,8 +64,7 @@ def plot_json(file_name, label):
     last_ten_valuesReduce = last_ten_values[:20]
 
     lissageValues = smooth(last_ten_valuesReduce)
-    print(len(lissageValues))
-    print(lissageValues)
+
     # Plot the graph
     #plt.plot(timestamps, values, label=label)
     #plt.plot(greater_than_valueReduce, last_ten_valuesReduce, label=label)
