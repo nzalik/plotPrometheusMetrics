@@ -96,8 +96,8 @@ start_time = min(all_timestamps)
 end_time = max(all_timestamps)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time = start_time - (start_time % 20)
-#end_time = end_time + (20 - end_time % 20)
+start_time = start_time - (start_time % 20)
+end_time = end_time + (20 - end_time % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks = np.arange(start_time, end_time + 1, 20)
@@ -131,14 +131,14 @@ start_time2 = min(all_timestamps2)
 end_time2 = max(all_timestamps2)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time2 = start_time2 - (start_time2 % 20)
-#end_time2 = end_time2 + (20 - end_time2 % 20)
+start_time2 = start_time2 - (start_time2 % 20)
+end_time2 = end_time2 + (20 - end_time2 % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks2 = np.arange(start_time2, end_time2 + 1, 20)
 
 # Set ticks on the x-axis
-ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks2]
+ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks]
 plt.xticks(ticks2, ticks_seconds2)
 plt.xlabel('Time (seconds)')
 plt.ylabel('Memory (Gbytes)')
@@ -156,7 +156,7 @@ nombre_lignes = len(df)
 
 nouvelles_lignes = []
 
-for i in range(121, 181):
+for i in range(121, 221):
     target_time = i + 0.5
     nouvelle_ligne = pd.DataFrame([[target_time, 0, 0, 0, 0, 0, 0]], columns=['Target Time', 'Load Intensity', 'Successful Transactions', 'Failed Transactions', 'Dropped Transactions', 'Avg Response Time', 'Final Batch Dispatch Time'])
     nouvelles_lignes.append(nouvelle_ligne)
@@ -207,8 +207,8 @@ print("le timestam")
 print(timestamps3)
 print(values3)
 
-x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465]
-y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,1.0]
+x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465, 1714666466, 1714666467]
+y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #
 plt.plot(x_values, y_values)
 #

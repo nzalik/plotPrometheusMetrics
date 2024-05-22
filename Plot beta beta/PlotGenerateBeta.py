@@ -72,6 +72,7 @@ def plot_json(file_name, label):
     #plt.plot(timestamps, values, label=label)
     #plt.plot(greater_than_valueReduce, last_ten_valuesReduce, label=label)
     plt.plot(greater_than_valueReduce, lissageValues, label=label)
+
     return greater_than_valueReduce
 
 
@@ -96,8 +97,8 @@ start_time = min(all_timestamps)
 end_time = max(all_timestamps)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time = start_time - (start_time % 20)
-#end_time = end_time + (20 - end_time % 20)
+start_time = start_time - (start_time % 20)
+end_time = end_time + (20 - end_time % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks = np.arange(start_time, end_time + 1, 20)
@@ -131,14 +132,18 @@ start_time2 = min(all_timestamps2)
 end_time2 = max(all_timestamps2)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time2 = start_time2 - (start_time2 % 20)
-#end_time2 = end_time2 + (20 - end_time2 % 20)
+start_time2 = start_time2 - (start_time2 % 20)
+end_time2 = end_time2 + (20 - end_time2 % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks2 = np.arange(start_time2, end_time2 + 1, 20)
 
 # Set ticks on the x-axis
-ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks2]
+ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks]
+
+ticks2 = np.append(ticks2, 1714664800)
+ticks_seconds2.append(240)
+
 plt.xticks(ticks2, ticks_seconds2)
 plt.xlabel('Time (seconds)')
 plt.ylabel('Memory (Gbytes)')
@@ -156,7 +161,7 @@ nombre_lignes = len(df)
 
 nouvelles_lignes = []
 
-for i in range(121, 181):
+for i in range(121, 221):
     target_time = i + 0.5
     nouvelle_ligne = pd.DataFrame([[target_time, 0, 0, 0, 0, 0, 0]], columns=['Target Time', 'Load Intensity', 'Successful Transactions', 'Failed Transactions', 'Dropped Transactions', 'Avg Response Time', 'Final Batch Dispatch Time'])
     nouvelles_lignes.append(nouvelle_ligne)
@@ -168,12 +173,37 @@ nombre_lignes2 = len(df)
 
 df['Target Time'] = df['Target Time'].astype(int)
 
+xx = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240]
+yy = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240]
 # Votre code pour créer le graphique
-plt.plot(df['Target Time'], df['Load Intensity'])
+plt.plot(xx, yy)
 
 # Définition des emplacements des marqueurs d'axe personnalisés
+start_time3 = min(df['Target Time'])
+end_time3 = max(df['Target Time'])
+
+start_time3 = start_time3 - (start_time3 % 20)
+end_time3 = end_time3 + (20 - end_time3 % 20)
+
+print(start_time3, end_time3)
+# Generate a list of ticks every 20 seconds
+ticks3 = np.arange(start_time3, end_time3 + 1, 20)
+
+print("les ticks pour le fichier")
+print(ticks3)
+# Set ticks on the x-axis
+ticks_seconds = [((ts - start_time) // 20) * 20 for ts in ticks]
+
 interval = 20
-plt.xticks(np.arange(min(df['Target Time']), max(df['Target Time'])+1, interval))
+
+plt.xticks(np.arange(20, max(df['Target Time'])+1, interval))
+
+ticks_seconds3 = [((ts - start_time3) // 20) * 20 for ts in ticks3]
+
+plt.xticks(ticks3, ticks_seconds3)
+plt.yticks(ticks3, ticks_seconds3)
+
+print(ticks_seconds3)
 
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of requests')
@@ -198,17 +228,11 @@ for item in data["data"]["result"]:
 
 datas = tab
 
-print(tab)
-
 timestamps3 = np.array([int(ts) for ts, _ in datas])
 values3 = [float(value) for _, value in datas]
 
-print("le timestam")
-print(timestamps3)
-print(values3)
-
-x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465]
-y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,1.0]
+x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465, 1714666466, 1714666467]
+y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #
 plt.plot(x_values, y_values)
 #
@@ -229,10 +253,6 @@ scaled_seconds = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #plt.figure(figsize=(12, 6))
 #plt.plot(scaled_seconds, values, marker='o', linestyle='-', linewidth=2)
 
-print("the array")
-print(scaled_seconds)
-print(values)
-
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of pods')
 plt.title('Evolution of pods')
@@ -241,10 +261,6 @@ plt.title('Evolution of pods')
 tick_values = [i * 20 for i in range(len(x_values))]
 tick_labels = [str(i * 20) for i in range(len(x_values))]
 
-print("les vleurs")
-print(tick_values)
-print("les labels")
-print(tick_labels)
 plt.xticks(x_values, tick_labels)
 
 plt.tight_layout()

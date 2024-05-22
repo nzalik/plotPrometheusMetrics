@@ -71,6 +71,8 @@ def plot_json(file_name, label):
     # Plot the graph
     #plt.plot(timestamps, values, label=label)
     #plt.plot(greater_than_valueReduce, last_ten_valuesReduce, label=label)
+    print("les valeursssss")
+    print(lissageValues)
     plt.plot(greater_than_valueReduce, lissageValues, label=label)
     return greater_than_valueReduce
 
@@ -96,8 +98,8 @@ start_time = min(all_timestamps)
 end_time = max(all_timestamps)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time = start_time - (start_time % 20)
-#end_time = end_time + (20 - end_time % 20)
+start_time = start_time - (start_time % 20)
+end_time = end_time + (20 - end_time % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks = np.arange(start_time, end_time + 1, 20)
@@ -105,7 +107,7 @@ ticks = np.arange(start_time, end_time + 1, 20)
 # Set ticks on the x-axis
 ticks_seconds = [((ts - start_time) // 20) * 20 for ts in ticks]
 
-plt.xticks(ticks, ticks_seconds)
+#plt.xticks(ticks, ticks_seconds)
 plt.xlabel('Time (seconds)')
 plt.ylabel('cores per second')
 plt.title('CPU usage')
@@ -131,14 +133,18 @@ start_time2 = min(all_timestamps2)
 end_time2 = max(all_timestamps2)
 
 # Calculate the nearest 20-second intervals for start and end times
-#start_time2 = start_time2 - (start_time2 % 20)
-#end_time2 = end_time2 + (20 - end_time2 % 20)
+start_time2 = start_time2 - (start_time2 % 20)
+end_time2 = end_time2 + (20 - end_time2 % 20)
 
 # Generate a list of ticks every 20 seconds
 ticks2 = np.arange(start_time2, end_time2 + 1, 20)
+print("HEEUUUUU")
+print(ticks2)
 
 # Set ticks on the x-axis
-ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks2]
+ticks_seconds2 = [((ts - start_time2) // 20) * 20 for ts in ticks]
+print(ticks_seconds2)
+
 plt.xticks(ticks2, ticks_seconds2)
 plt.xlabel('Time (seconds)')
 plt.ylabel('Memory (Gbytes)')
@@ -156,7 +162,7 @@ nombre_lignes = len(df)
 
 nouvelles_lignes = []
 
-for i in range(121, 181):
+for i in range(121, 221):
     target_time = i + 0.5
     nouvelle_ligne = pd.DataFrame([[target_time, 0, 0, 0, 0, 0, 0]], columns=['Target Time', 'Load Intensity', 'Successful Transactions', 'Failed Transactions', 'Dropped Transactions', 'Avg Response Time', 'Final Batch Dispatch Time'])
     nouvelles_lignes.append(nouvelle_ligne)
@@ -172,8 +178,21 @@ df['Target Time'] = df['Target Time'].astype(int)
 plt.plot(df['Target Time'], df['Load Intensity'])
 
 # Définition des emplacements des marqueurs d'axe personnalisés
+
+# Calculate the start and end times
+start_time4 = min(df['Target Time'])
+end_time4 = max(df['Target Time'])
+
+# Calculate the nearest 20-second intervals for start and end times
+start_time4 = start_time4 - (start_time4 % 20)
+end_time4 = end_time4 + (20 - end_time4 % 20)
+
+ticks4 = np.arange(start_time4, end_time4 + 1, 20)
+
+ticks_seconds4 = [((ts - start_time4) // 20) * 20 for ts in ticks4]
+
 interval = 20
-plt.xticks(np.arange(min(df['Target Time']), max(df['Target Time'])+1, interval))
+plt.xticks(ticks4, ticks_seconds4)
 
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of requests')
@@ -207,8 +226,8 @@ print("le timestam")
 print(timestamps3)
 print(values3)
 
-x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465]
-y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,1.0]
+x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464, 1714666465, 1714666466, 1714666467]
+y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 #
 plt.plot(x_values, y_values)
 #
