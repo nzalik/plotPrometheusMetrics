@@ -1,0 +1,28 @@
+NoLoad -> NoLoad3 sont faits en récupérant les données sur une fenetre de 15min à partir de la date
+courante
+
+NoLoad4 descend sur une fenetre de 2h et montre le moment du déploiement des pods sous k8s
+
+NoLoad5 Affiche sur une fenetre de 2h30  l'nsemble des valeurs colelctées depuis l'api
+A noter que avec la fonction smooth, le lissage fait disparaitre des points sur le
+graphique de cpu.
+
+Load file are goint to contains the same plot with the different profile
+increasingHighIntensity.csv
+increasingLowIntensity.csv
+increasingMedIntensity.csv
+
+LUA scripts 256 utilisateurs
+
+teastore_buy.lua
+
+Load1 charge avec 15minites de fenetre limit plot 1716985520.148
+Load1-bis avec 1h pour voir le point de basculement no limit plot
+The teastore webui has restarted two times
+
+Load2 charges meduim
+Teastore-webui has restarted 3 times
+
+Je relance le même travail avec les même pod et sans limitation sur les données
+
+Le webui n'a pas redémarré

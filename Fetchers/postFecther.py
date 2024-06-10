@@ -6,12 +6,17 @@ import os
 import matplotlib.pyplot as plt
 import time
 
+window = 6
+window2 = 10
+
 
 def read_parameters_from_json(file_path):
     with open(file_path, 'r') as file:
         parameters = json.load(file)
     return parameters
 
+
+save_path = "../1Odata/07-06-24/cpu-variation/data/"  #The directory where you want things to be saved
 
 file_path = '../teastore.json'
 parameters = read_parameters_from_json(file_path)
@@ -90,8 +95,10 @@ def _init_metric_metadata(metric):
 
         if (metadata['type'] == "gauge"):
             return f"{metric}{{pod=\"{container_name}\"}}"
+        elif (metadata['type'] == "counter"):
+            return f"irate({metric}{{pod=\"{container_name}\"}}[1h])"
         else:
-            return f"sum(irate({metric}{{pod=\"{container_name}\"}}[10m]))/1"
+            return f"{metric}{{namespace=\"default\"}}"
 
 
 def read_ini_file(file_path):
@@ -128,7 +135,8 @@ for section_name in config.sections():
             current_time = datetime.now()
 
             # Subtract 10 minutes
-            new_time = current_time - timedelta(minutes=25)
+            new_time = current_time - timedelta(hours=1)
+            #new_time = current_time - timedelta(minutes=window2)
 
             # Convert the result to a timestamp
             new_timestamp = new_time.timestamp()
@@ -145,14 +153,15 @@ for section_name in config.sections():
             print("Querying " + url + " with payload " + str(payload))
 
             res = None
-            directory = "../data/"+key
+            directory = save_path + key
             filename = svc + '.json'
             query_str_file = os.path.join(directory, filename)
             #query_str_file = "nom_du_fichier.json"
             os.makedirs(directory, exist_ok=True)
             # Query Prometheus
             try:
-                res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}, data=payload).json()
+                res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                                    data=payload).json()
                 print("la reponse")
                 print(res)
                 with open(query_str_file, 'a') as f:
@@ -162,13 +171,12 @@ for section_name in config.sections():
                 print(e)
                 print("...Fail at Prometheus request.")
 
-
 current_timestamp = datetime.now().timestamp()
 
 current_time = datetime.now()
 
 # Subtract 10 minutes
-new_time = current_time - timedelta(minutes=15)
+new_time = current_time - timedelta(hours=1)
 
 # Convert the result to a timestamp
 new_timestamp = new_time.timestamp()
@@ -176,17 +184,24 @@ new_timestamp = new_time.timestamp()
 step = parameters['STEP']
 container_name = "pod_info"
 
-url = prom_url + '/api/v1/query?query=count(kube_pod_info{namespace="default"})'
+query_str = "kube_deployment_status_replicas{namespace=\"default\"}"
+
+url = prom_url + '/api/v1/query_range?'
+
+payload = {'query': query_str, 'start': new_timestamp, 'end': current_timestamp, 'step': step}
 
 res = None
-directory = "../data/pod_info"
+
+directory = save_path + "pod_info"
 filename = container_name + '.json'
 query_str_file = os.path.join(directory, filename)
 #query_str_file = "nom_du_fichier.json"
 os.makedirs(directory, exist_ok=True)
 # Query Prometheus
 try:
-    res = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
+    #res = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
+    res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                        data=payload).json()
     print("la reponse pour les pods")
     print(res)
     with open(query_str_file, 'a') as f:

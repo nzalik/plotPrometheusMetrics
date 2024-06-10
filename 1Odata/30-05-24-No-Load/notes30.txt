@@ -1,0 +1,12 @@
+Take 10min data from prometheus for noload
+
+0.5cpu et 5giga memoire
+
+La plupart des requetes ont échoué avec le simple load
+Je vais reprendre sur un windiw de 40 minutes
+
+Rejet de pleins de requetes qui arrivent jsuqua 3000 reuqetes
+restart one time
+
+Récupération pour le meduim low 1H
+restart 2 fois
