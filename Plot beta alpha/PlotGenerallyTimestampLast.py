@@ -25,7 +25,7 @@ def plot_json(file_name, label):
 
     timestamps = np.array([int(ts) for ts, _ in datas])
 
-    given_value = 1717733878.849 # Replace with your desired value
+    given_value = 1718056323.023 # Replace with your desired value
     #given_value = 1716985520.148 # Replace with your desired value
 
     greater_than_value = timestamps[timestamps > given_value]
@@ -55,7 +55,7 @@ plt.figure(figsize=(10, 16))
 plt.subplot(4, 1, 1)
 all_timestamps = []
 
-save_path = "../1Odata/07-06-24/cpu-variation/data/"
+save_path = "../data/cpu-variation/data/"
 
 directory = save_path + 'cpu'
 for file_name in os.listdir(directory):
@@ -132,16 +132,26 @@ plt.subplot(4, 1, 3)
 
 resultat = ticks_seconds2[3:]
 
-plot_path="../Load/07-06-24/"
+plot_path="../Load/10-06-24/"
 
-df = pd.read_csv(plot_path+'outputLoadIntensity-with-autoscaler.csv')
+test = 0
+
+try:
+    df = pd.read_csv(plot_path+'outputLoadIntensity-with-autoscaler.csv')
+except FileNotFoundError:
+    #print(f"Le fichier {file_name} n'a pas été trouvé dans le chemin {plot_path}")
+    # Vous pouvez également faire d'autres traitements ici, comme retourner un DataFrame vide
+    df = pd.DataFrame()
+    test = 0
+
+
 #df = pd.DataFrame()
 
 nombre_lignes = len(df)
 
 nouvelles_lignes = []
 
-for i in range(121, lastEl+1):
+for i in range(test, lastEl+1):
 #for i in range(0, lastEl+1):
     target_time = i + 0.5
     nouvelle_ligne = pd.DataFrame([[target_time, 0, 0, 0, 0, 0, 0]],
@@ -173,43 +183,62 @@ all_timestamps3 = []
 directory3 = save_path+'pod_info/pod_info.json'
 
 with open(directory3, 'r') as file:
-    data = json.load(file)
+    source = json.load(file)
 
 timestamps = []
 values = []
 tab = []
 
-for item in data["data"]["result"]:
-    timestamp = item["metric"][0]
-    value = float(item["value"][1])
-    tab.append(item["value"])
+data_list = source['data']['result']
 
-    timestamps.append(timestamp)
-    values.append(value)
 
-datas = tab
+for json_data in data_list:
+    # Convertir la chaîne JSON en un dictionnaire Python
+    result = json_data
 
-timestamps3 = np.array([int(ts) for ts, _ in datas])
-values3 = [float(value) for _, value in datas]
+    # Extraire les valeurs et les timestamps
+    timestamps = [float(x[0]) for x in result["values"]]
+    values = [float(x[1]) for x in result["values"]]
 
-x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464,
-            1714666465]
-y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+    print(max)
+    print(max(values))
+
+    # Récupérer le nom de la métrique et du déploiement
+    metric_name = result["metric"]["__name__"]
+    deployment_name = result["metric"]["deployment"]
+
+    # Tracer la courbe
+    plt.plot(timestamps, values, label=f"{metric_name} - {deployment_name}")
+
+# for item in source["data"]["result"]:
+#     timestamp = item["metric"][0]
+#     value = float(item["value"][1])
+#     tab.append(item["value"])
 #
-#plt.plot(x_values, y_values)
+#     timestamps.append(timestamp)
+#     values.append(value)
 #
-plt.plot(timestamps3, values3, label="pods")
-#plt.plot(timestamps3, values3, marker='o', linestyle='-', linewidth=2)
-print("the array")
-print(tab)
+# datas = tab
+#
+# timestamps3 = np.array([int(ts) for ts, _ in datas])
+# values3 = [float(value) for _, value in datas]
+#
+# x_values = [1714666456, 1714666457, 1714666458, 1714666459, 1714666460, 1714666461, 1714666462, 1714666463, 1714666464,
+#             1714666465]
+# y_values = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+# #
+# #plt.plot(x_values, y_values)
+# #
+# plt.plot(timestamps3, values3, label="pods")
+
 # Convert timestamps to time values
-times = [datetime.fromtimestamp(ts) for ts in timestamps]
+#times = [datetime.fromtimestamp(ts) for ts in timestamps]
 
 # Transform time values into seconds with interval of 20 seconds
-start_time = min(times)
-seconds = [(t - start_time).total_seconds() for t in times]
+#start_time = min(times)
+#seconds = [(t - start_time).total_seconds() for t in times]
 #scaled_seconds = [s * 20 for s in seconds]
-scaled_seconds = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+#scaled_seconds = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
 # Plotting
 #plt.figure(figsize=(12, 6))
@@ -220,12 +249,12 @@ plt.ylabel('Number of pods')
 plt.title('Evolution of pods')
 
 # Set x-axis tick values and labels
-tick_values = [i * 20 for i in range(len(x_values))]
-tick_labels = [str(i * 20) for i in range(len(x_values))]
+#tick_values = [i * 20 for i in range(len(x_values))]
+#tick_labels = [str(i * 20) for i in range(len(x_values))]
 
-plt.xticks(x_values, tick_labels)
+#plt.xticks(x_values, tick_labels)
 
 plt.tight_layout()
 
-plt.savefig('../Plots/07-06-24/outputLowLoadAutoscalerPodInfo.png')
+plt.savefig('../Plots/10-06-24/outputNoLoad22.png')
 plt.show()

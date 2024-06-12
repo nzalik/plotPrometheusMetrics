@@ -1,13 +1,12 @@
 import requests
 import configparser
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import os
 import matplotlib.pyplot as plt
 import time
 
-window = 6
-window2 = 10
+file_path = '../teastore.json'
 
 
 def read_parameters_from_json(file_path):
@@ -16,30 +15,55 @@ def read_parameters_from_json(file_path):
     return parameters
 
 
-save_path = "../1Odata/07-06-24/cpu-variation/data/"  #The directory where you want things to be saved
-
-file_path = '../teastore.json'
 parameters = read_parameters_from_json(file_path)
-print(parameters)
+
+load = parameters['DURATION']
+
+window = 6
+window2 = 10
+
+#os.makedirs("../data", exist_ok=True)
+
+today = date.today()
+dir_name = today.strftime("%d-%m-%Y")
+
+save_path = f"../{dir_name + '/data' + parameters['WORKLOAD']}/"  #The directory where you want things to be saved
+#save_path = "../data/"  #The directory where you want things to be saved
+
+if os.path.exists(save_path):
+    # Récupérer la liste des fichiers dans le répertoire "data"
+    files = os.listdir(save_path)
+
+    # Trouver le nombre de fichiers "data" existants
+    #data_count = sum(1 for f in files if f.startswith("data"))
+
+    # Construire le nouveau nom de répertoire
+    new_dir_name = f"data_{datetime.now().strftime('%H-%M-%S')}"
+    #new_dir_name = f"data{data_count + 1}_{datetime.now().strftime('%H-%M')}"
+    save_path = f"../{dir_name}/{new_dir_name}"
+
+    # Créer le nouveau répertoire
+    #os.makedirs(save_path, exist_ok=True)
+    #print(f"Nouveau répertoire créé : {save_path}")
 
 prom_url = parameters['PROMETHEUS_URL']
 
 
 def query_prometheus(query):
-    url = prom_url + '/api/v1/' + query
-    print("Querying " + url)
+    my_url = prom_url + '/api/v1/' + query
+    #print("Querying " + url)
     res = None
 
+    print(my_url)
+
     try:
-        res = requests.get(url).json()
-        print("Query successful")
-        print(res)
+        res = requests.get(my_url).json()
+    # print("Query successful")
+    #print(res)
     except Exception as e:
         print(e)
-        print("...Fail at Prometheus.")
 
     if res != None and 'error' in res:
-        print(res["error"])
         res = None
 
     return res
@@ -47,7 +71,6 @@ def query_prometheus(query):
 
 def query_svc_names(namespace='default'):
     query_str = '/label/pod/values?match[]=kube_pod_container_info{namespace="' + namespace + '"}'
-    print("Querying existing services by " + query_str)
     res = query_prometheus(query_str)
     svc_names = []
     services = res['data']
@@ -64,18 +87,15 @@ def query_svc_names(namespace='default'):
     #             services.append(service_obj)
 
     # print("...Services found at namespace " + namespace + ': ' + str(services))
-    print("voici les services")
-    print(services)
+
     return services
 
 
-def _init_metric_metadata(metric):
+def _init_metric_metadata(metric, interval):
     #for metric in names:
-    print("#########################")
-    print(metric)
+
     query_str = 'metadata?metric=' + metric
     url = prom_url + '/api/v1/' + query_str
-    print("Querying metadata at " + url)
     metric_obj = {}
     res = None
 
@@ -83,20 +103,17 @@ def _init_metric_metadata(metric):
         res = requests.get(url).json()
     except Exception as e:
         print(e)
-        print("...Fail at Prometheus request.")
 
     if res != None and 'error' in res:
         print(res["error"])
         res = None
     elif res != None and res['data']:
         metadata = res['data'][metric][0]
-        print("#########################")
-        print(metadata)
 
         if (metadata['type'] == "gauge"):
-            return f"{metric}{{pod=\"{container_name}\"}}"
+            return f"{metric}{{pod=\"{container_name}\", container!=\"\" }}"
         elif (metadata['type'] == "counter"):
-            return f"irate({metric}{{pod=\"{container_name}\"}}[1h])"
+            return f"irate({metric}{{pod=\"{container_name}\", container!=\"\"}}[{interval}])"
         else:
             return f"{metric}{{namespace=\"default\"}}"
 
@@ -108,9 +125,6 @@ def read_ini_file(file_path):
 
 
 all_services = query_svc_names()
-
-print("voici les services")
-print(all_services)
 
 file_path = '../config.ini'
 config = read_ini_file(file_path)
@@ -133,9 +147,16 @@ for section_name in config.sections():
             current_timestamp = datetime.now().timestamp()
 
             current_time = datetime.now()
-
+            valueTime = parameters['DURATION']
+            unit = parameters['DURATION_UNIT']
             # Subtract 10 minutes
-            new_time = current_time - timedelta(hours=1)
+            if unit == "hours":
+                new_time = current_time - timedelta(hours=int(valueTime))
+                interval = valueTime + "h"
+            else:
+                new_time = current_time - timedelta(minutes=int(valueTime))
+                interval = valueTime + "m"
+
             #new_time = current_time - timedelta(minutes=window2)
 
             # Convert the result to a timestamp
@@ -144,16 +165,16 @@ for section_name in config.sections():
             step = parameters['STEP']
             container_name = svc
 
-            query_str = _init_metric_metadata(value)
+            query_str = _init_metric_metadata(value, interval)
 
             payload = {'query': query_str, 'start': new_timestamp, 'end': current_timestamp, 'step': step}
 
             url = prom_url + '/api/v1/query_range?'
 
-            print("Querying " + url + " with payload " + str(payload))
+            #print("Querying " + url + " with payload " + str(payload))
 
             res = None
-            directory = save_path + key
+            directory = save_path + "/" + key
             filename = svc + '.json'
             query_str_file = os.path.join(directory, filename)
             #query_str_file = "nom_du_fichier.json"
@@ -162,8 +183,8 @@ for section_name in config.sections():
             try:
                 res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                                     data=payload).json()
-                print("la reponse")
-                print(res)
+                #print("la reponse")
+                #print(res)
                 with open(query_str_file, 'a') as f:
                     json.dump(res, f, ensure_ascii=False)
 
@@ -175,8 +196,16 @@ current_timestamp = datetime.now().timestamp()
 
 current_time = datetime.now()
 
+valueTime = parameters['DURATION']
+unit = parameters['DURATION_UNIT']
 # Subtract 10 minutes
-new_time = current_time - timedelta(hours=1)
+if unit == "hours":
+    new_time = current_time - timedelta(hours=int(valueTime))
+else:
+    new_time = current_time - timedelta(minutes=int(valueTime))
+
+# Subtract 10 minutes
+#new_time = current_time - timedelta(hours=1)
 
 # Convert the result to a timestamp
 new_timestamp = new_time.timestamp()
@@ -192,7 +221,7 @@ payload = {'query': query_str, 'start': new_timestamp, 'end': current_timestamp,
 
 res = None
 
-directory = save_path + "pod_info"
+directory = save_path + "/pod_info"
 filename = container_name + '.json'
 query_str_file = os.path.join(directory, filename)
 #query_str_file = "nom_du_fichier.json"
@@ -202,8 +231,8 @@ try:
     #res = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
     res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                         data=payload).json()
-    print("la reponse pour les pods")
-    print(res)
+    #print("la reponse pour les pods")
+    #print(res)
     with open(query_str_file, 'a') as f:
         json.dump(res, f, ensure_ascii=False)
 

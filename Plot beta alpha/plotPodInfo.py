@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import json
 
-save_path = "../1Odata/07-06-24/cpu-variation/data/"
+save_path = "../data/cpu-variation/data/"
 directory3 = save_path+'pod_info/pod_info.json'
 
 with open(directory3, 'r') as file:
