@@ -5,7 +5,10 @@ import numpy as np
 import json
 import re
 import pandas as pd
-from datetime import datetime
+import json
+from datetime import datetime, timedelta, date
+
+
 def smooth(values, w_size=5):
     new_values = []
     for i in range(len(values)):
@@ -18,35 +21,33 @@ def plot_json(file_name, label):
     with open(file_name, 'r') as file:
         json_data = json.load(file)
 
-    datas = json_data['data']['result'][0]['values']
+    print(file_name)
+    print(json_data)
 
-    if(len(datas) == 0):
-        return []
+    if len(json_data['data']['result']) > 0:
+        datas = json_data['data']['result'][0]['values']
 
-    timestamps = np.array([int(ts) for ts, _ in datas])
+        timestamps = np.array([int(ts) for ts, _ in datas])
 
-    given_value = 1718056323.023 # Replace with your desired value
-    #given_value = 1716985520.148 # Replace with your desired value
+        given_value = 0.0  # Replace with your desired value
+        #given_value = 1716985520.148 # Replace with your desired value
 
-    greater_than_value = timestamps[timestamps > given_value]
-    less_than_value = timestamps[timestamps <= given_value]
+        greater_than_value = timestamps[timestamps > given_value]
+        less_than_value = timestamps[timestamps <= given_value]
 
-    values = [float(value) for _, value in datas]
+        values = [float(value) for _, value in datas]
 
-    last_ten_values = values[-(len(greater_than_value)):]
+        last_ten_values = values[-(len(greater_than_value)):]
 
-    greater_than_valueReduce = greater_than_value
-    last_ten_valuesReduce = last_ten_values
+        greater_than_valueReduce = greater_than_value
+        last_ten_valuesReduce = last_ten_values
 
-    print("la valeur max de la mémoire cest")
-    print(max(last_ten_valuesReduce))
+        #lissageValues = smooth(last_ten_valuesReduce)
+        lissageValues = last_ten_valuesReduce
 
-    #lissageValues = smooth(last_ten_valuesReduce)
-    lissageValues = last_ten_valuesReduce
-
-    plt.plot(greater_than_valueReduce, lissageValues, label=label)
-    return greater_than_valueReduce
-
+        plt.plot(greater_than_valueReduce, lissageValues, label=label)
+        return greater_than_valueReduce
+    return []
 
 # Initialize the plot
 plt.figure(figsize=(10, 16))
@@ -55,7 +56,15 @@ plt.figure(figsize=(10, 16))
 plt.subplot(4, 1, 1)
 all_timestamps = []
 
-save_path = "../data/cpu-variation/data/"
+today = date.today()
+dir_name = today.strftime("%d-%m-%Y")
+
+save_graphics_at = f"../Plots/{dir_name}"  #T
+# he directory where you want things to be saved
+if not os.path.exists(save_graphics_at):
+    os.makedirs(save_graphics_at)
+
+save_path = "../13-06-2024/data_15-21/"
 
 directory = save_path + 'cpu'
 for file_name in os.listdir(directory):
@@ -66,7 +75,12 @@ for file_name in os.listdir(directory):
     result = re.split(r'-\d+', last_part)[0]
     print(result)
     timestamps = plot_json(file_path, result)
-    all_timestamps.append(timestamps)
+
+    print("cpu")
+    print(timestamps)
+
+    if len(timestamps) > 0:
+        all_timestamps.append(timestamps)
 
 # Concatenate all timestamps
 all_timestamps = np.concatenate(all_timestamps)
@@ -95,8 +109,7 @@ plt.legend()
 plt.subplot(4, 1, 2)
 all_timestamps2 = []
 
-
-directory2 = save_path+'memory'
+directory2 = save_path + 'memory'
 for file_name in os.listdir(directory2):
     file_path = os.path.join(directory2, file_name)
     #for file_name in json_files1:
@@ -104,7 +117,8 @@ for file_name in os.listdir(directory2):
     last_part = (file_parts[-1]).split(".")[0]
     result = re.split(r'-\d+', last_part)[0]
     timestamps2 = plot_json(file_path, result)
-    all_timestamps2.append(timestamps2)
+    if len(timestamps2) > 0:
+        all_timestamps2.append(timestamps2)
 
 # Concatenate all timestamps
 all_timestamps2 = np.concatenate(all_timestamps2)
@@ -132,18 +146,17 @@ plt.subplot(4, 1, 3)
 
 resultat = ticks_seconds2[3:]
 
-plot_path="../Load/10-06-24/"
+plot_path = "../Load/10-06-24/"
 
 test = 0
 
 try:
-    df = pd.read_csv(plot_path+'outputLoadIntensity-with-autoscaler.csv')
+    df = pd.read_csv(plot_path + 'outputLoadIntensity-with-autoscaler.csv')
 except FileNotFoundError:
     #print(f"Le fichier {file_name} n'a pas été trouvé dans le chemin {plot_path}")
     # Vous pouvez également faire d'autres traitements ici, comme retourner un DataFrame vide
     df = pd.DataFrame()
     test = 0
-
 
 #df = pd.DataFrame()
 
@@ -151,8 +164,8 @@ nombre_lignes = len(df)
 
 nouvelles_lignes = []
 
-for i in range(test, lastEl+1):
-#for i in range(0, lastEl+1):
+for i in range(test, lastEl + 1):
+    #for i in range(0, lastEl+1):
     target_time = i + 0.5
     nouvelle_ligne = pd.DataFrame([[target_time, 0, 0, 0, 0, 0, 0]],
                                   columns=['Target Time', 'Load Intensity', 'Successful Transactions',
@@ -180,7 +193,7 @@ plt.ylabel('Number of requests')
 plt.subplot(4, 1, 4)
 all_timestamps3 = []
 # Read JSON data from a file
-directory3 = save_path+'pod_info/pod_info.json'
+directory3 = save_path + 'pod_info/pod_info.json'
 
 with open(directory3, 'r') as file:
     source = json.load(file)
@@ -190,7 +203,6 @@ values = []
 tab = []
 
 data_list = source['data']['result']
-
 
 for json_data in data_list:
     # Convertir la chaîne JSON en un dictionnaire Python
@@ -247,7 +259,7 @@ for json_data in data_list:
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of pods')
 plt.title('Evolution of pods')
-
+plt.legend()
 # Set x-axis tick values and labels
 #tick_values = [i * 20 for i in range(len(x_values))]
 #tick_labels = [str(i * 20) for i in range(len(x_values))]
@@ -256,5 +268,9 @@ plt.title('Evolution of pods')
 
 plt.tight_layout()
 
-plt.savefig('../Plots/10-06-24/outputNoLoad22.png')
+files = os.listdir(save_graphics_at)
+data_count = sum(1 for f in files if f.startswith("output") and f.endswith(".png"))
+print(data_count)
+my_string = f"{save_graphics_at}/output{str(data_count + 1)}.png"
+plt.savefig(my_string)
 plt.show()

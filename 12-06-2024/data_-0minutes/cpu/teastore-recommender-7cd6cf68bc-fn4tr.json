@@ -1,0 +1,1 @@
+{"status": "error", "errorType": "bad_data", "error": "invalid parameter \"query\": 1:101: parse error: duration must be greater than 0"}

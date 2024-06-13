@@ -1,10 +1,10 @@
 from datetime import datetime
 
 #time_str = "12:09:58.023"
-time_str = "23:52:03.023"
+time_str = "12:44:33.261"
 
 # Assuming today's date for simplicity
-date_str = "2024-06-10"
+date_str = "2024-06-13"
 
 # Combine date and time strings to create a datetime object
 datetime_str = date_str + " " + time_str
