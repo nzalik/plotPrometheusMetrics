@@ -75,8 +75,6 @@ all_timestamps = np.concatenate(all_timestamps)
 start_time = min(all_timestamps)
 end_time = max(all_timestamps)
 
-print("time")
-print(start_time)
 # Generate a list of ticks every 20 seconds
 ticks = np.arange(start_time, end_time + 1, 20)
 

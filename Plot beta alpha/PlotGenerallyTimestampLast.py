@@ -64,7 +64,7 @@ save_graphics_at = f"../Plots/{dir_name}"  #T
 if not os.path.exists(save_graphics_at):
     os.makedirs(save_graphics_at)
 
-save_path = "../13-06-2024/data_15-21/"
+save_path = "../13-06-2024/data_15-56/"
 
 directory = save_path + 'cpu'
 for file_name in os.listdir(directory):
@@ -151,7 +151,7 @@ plot_path = "../Load/10-06-24/"
 test = 0
 
 try:
-    df = pd.read_csv(plot_path + 'outputLoadIntensity-with-autoscaler.csv')
+    df = pd.read_csv(plot_path + 'outputMeduimProfileWith_Autoscaler-13-06-24.csv')
 except FileNotFoundError:
     #print(f"Le fichier {file_name} n'a pas été trouvé dans le chemin {plot_path}")
     # Vous pouvez également faire d'autres traitements ici, comme retourner un DataFrame vide
@@ -182,6 +182,7 @@ df['Target Time'] = df['Target Time'].astype(int)
 
 # Votre code pour créer le graphique
 plt.plot(df['Target Time'], df['Load Intensity'])
+plt.plot(df['Target Time'], df['Successful Transactions'])
 
 # Définition des emplacements des marqueurs d'axe personnalisés
 interval = 20
@@ -220,7 +221,7 @@ for json_data in data_list:
     deployment_name = result["metric"]["deployment"]
 
     # Tracer la courbe
-    plt.plot(timestamps, values, label=f"{metric_name} - {deployment_name}")
+    plt.plot(timestamps, values, label=f"{deployment_name}")
 
 # for item in source["data"]["result"]:
 #     timestamp = item["metric"][0]

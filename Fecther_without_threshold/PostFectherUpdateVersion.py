@@ -88,7 +88,7 @@ def _init_metric_metadata(metric):
 
     step = parameters['STEP']
 
-    cpu_step = "5m"
+    cpu_step = "15m"
     query_str = 'metadata?metric=' + metric
     url = prom_url + '/api/v1/' + query_str
     metric_obj = {}
@@ -144,9 +144,9 @@ responses = {}
 # Obtenir la section 'requetes' du fichier de configuration
 requetes_section = config['requetes']
 
-new_timestampManual = 1718274573.261
+new_timestampManual = 1718616000.0
 
-target_timeManual = 1718275473.261
+target_timeManual = 1718622000.0
 
 # Parcourir toutes les clés de la section 'requetes' et effectuer les requêtes
 # while loop_limit > 0:
@@ -231,30 +231,41 @@ for section_name in config.sections():
     container_name = "pod_info"
 
     query_str = "kube_deployment_status_replicas_ready{namespace=\"default\"}"
+    query_str2 = ("sum(irate(container_cpu_usage_seconds_total{namespace=\"default\", container!=\"\"}[5m])) by ("
+                  "container)")
 
     url = prom_url + '/api/v1/query_range?'
 
     payload = {'query': query_str, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
+    payload2 = {'query': query_str2, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
 
     res = None
 
     directory2 = path_to_save(dir_name) + "/pod_info"
+    directory3 = path_to_save(dir_name) + "/aggregation"
     filename = container_name + '.json'
+    filename2 = 'aggregation.json'
     query_str_file = os.path.join(directory2, filename)
+    query_str_file2 = os.path.join(directory3, filename2)
     # query_str_file = "nom_du_fichier.json"
     os.makedirs(directory2, exist_ok=True)
+    os.makedirs(directory3, exist_ok=True)
     # Query Prometheus
     try:
         # res = requests.get(url, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json()
         res = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                             data=payload).json()
+        res2 = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                            data=payload2).json()
         # print("la reponse pour les pods")
         # print(res)
         with open(query_str_file, 'a') as f:
             json.dump(res, f, ensure_ascii=False)
 
+        with open(query_str_file2, 'a') as f:
+            json.dump(res2, f, ensure_ascii=False)
+
     except Exception as e:
         print(e)
         print("...Fail at Prometheus request.")
 
-    time.sleep(30)
