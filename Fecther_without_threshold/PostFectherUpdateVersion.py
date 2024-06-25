@@ -9,6 +9,26 @@ import time
 file_path = '../teastore.json'
 
 
+def get_timestamp(time_str, date_str=None):
+    """
+    Converts a date and time string to a timestamp.
+
+    Args:
+        date_str (str, optional): The date string in the format "YYYY-MM-DD". If not provided, the current date will be used.
+        time_str (str): The time string in the format "HH:MM:SS.fff".
+
+    Returns:
+        float: The timestamp.
+    """
+    if date_str is None:
+        date_str = date.today().strftime("%Y-%m-%d")
+
+    datetime_str = date_str + " " + time_str
+    dt_obj = datetime.strptime(datetime_str, "%Y-%m-%d %H:%M:%S.%f")
+    timestamp = dt_obj.timestamp()
+    return timestamp
+
+
 def read_parameters_from_json(file_path):
     with open(file_path, 'r') as file:
         parameters = json.load(file)
@@ -144,9 +164,9 @@ responses = {}
 # Obtenir la section 'requetes' du fichier de configuration
 requetes_section = config['requetes']
 
-new_timestampManual = 1718616000.0
+new_timestampManual = 1719308320.88
 
-target_timeManual = 1718622000.0
+target_timeManual = 1719308500.88
 
 # Parcourir toutes les clés de la section 'requetes' et effectuer les requêtes
 # while loop_limit > 0:
@@ -231,22 +251,31 @@ for section_name in config.sections():
     container_name = "pod_info"
 
     query_str = "kube_deployment_status_replicas_ready{namespace=\"default\"}"
-    query_str2 = ("sum(irate(container_cpu_usage_seconds_total{namespace=\"default\", container!=\"\"}[5m])) by ("
-                  "container)")
+    query_str2 = ("sum(irate(container_cpu_usage_seconds_total{namespace=\"default\", container!=\"\"}[5m])) by (container)")
+    query_str3 = ("sum(container_memory_usage_bytes{namespace=\"default\", container!=\"\"}) by (container)")
+    query_str4 = "kube_pod_container_status_restarts_total{namespace=\"default\", container!=\"\"}"
 
     url = prom_url + '/api/v1/query_range?'
 
     payload = {'query': query_str, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
     payload2 = {'query': query_str2, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
+    payload3 = {'query': query_str3, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
+    payload4 = {'query': query_str4, 'start': new_timestampManual, 'end': target_timeManual, 'step': step}
 
     res = None
 
     directory2 = path_to_save(dir_name) + "/pod_info"
     directory3 = path_to_save(dir_name) + "/aggregation"
+
     filename = container_name + '.json'
     filename2 = 'aggregation.json'
+    filename3 = 'aggregation_memory.json'
+    filename4 = 'pod_restart.json'
+
     query_str_file = os.path.join(directory2, filename)
     query_str_file2 = os.path.join(directory3, filename2)
+    query_str_file3 = os.path.join(directory3, filename3)
+    query_str_file4 = os.path.join(directory3, filename4)
     # query_str_file = "nom_du_fichier.json"
     os.makedirs(directory2, exist_ok=True)
     os.makedirs(directory3, exist_ok=True)
@@ -257,6 +286,11 @@ for section_name in config.sections():
                             data=payload).json()
         res2 = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
                             data=payload2).json()
+        res3 = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                            data=payload3).json()
+
+        res4 = requests.post(url, headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                             data=payload4).json()
         # print("la reponse pour les pods")
         # print(res)
         with open(query_str_file, 'a') as f:
@@ -264,6 +298,12 @@ for section_name in config.sections():
 
         with open(query_str_file2, 'a') as f:
             json.dump(res2, f, ensure_ascii=False)
+
+        with open(query_str_file3, 'a') as f:
+            json.dump(res3, f, ensure_ascii=False)
+
+        with open(query_str_file4, 'a') as f:
+            json.dump(res4, f, ensure_ascii=False)
 
     except Exception as e:
         print(e)

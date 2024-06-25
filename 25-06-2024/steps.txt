@@ -1,0 +1,12 @@
+data_10-26 reprise des experimentations sur 3 minutes et 50requests
+
+data_10-32 que j'ai rallongé la collecte sur 4 minutes pour
+que le graphiques soit aligné
+
+11_49
+sur 65 requests sur 4minutes
+
+11_52 sur 3mintes de fenetre
+
+11_53 sur deux minutes
+

@@ -56,7 +56,7 @@ def plot_json(file_name, label):
 plt.figure(figsize=(10, 16))
 
 # Plot the first set of data
-plt.subplot(5, 1, 1)
+plt.subplot(6, 1, 1)
 all_timestamps = []
 
 today = date.today()
@@ -67,7 +67,7 @@ save_graphics_at = f"../Plots/{dir_name}"  #T
 if not os.path.exists(save_graphics_at):
     os.makedirs(save_graphics_at)
 
-save_path = "../17-06-2024/data_15-45/"
+save_path = "../25-06-2024/data_08-26/"
 
 directory = save_path + 'cpu'
 for file_name in os.listdir(directory):
@@ -106,7 +106,7 @@ plt.xticks(rotation=45)
 plt.legend()
 
 # Plot the second set of data
-plt.subplot(5, 1, 2)
+plt.subplot(6, 1, 2)
 all_timestamps2 = []
 
 directory2 = save_path + 'memory'
@@ -128,8 +128,7 @@ all_timestamps2 = np.concatenate(all_timestamps2)
 # Calculate the start and end times
 start_time2 = min(all_timestamps2)
 end_time2 = max(all_timestamps2)
-print("taille des elements ")
-print(len(all_timestamps2))
+
 
 # Generate a list of ticks every 20 seconds
 ticks2 = np.arange(start_time2, end_time2 + plot_window, plot_window)
@@ -137,8 +136,6 @@ ticks2 = np.arange(start_time2, end_time2 + plot_window, plot_window)
 # Set ticks on the x-axis
 ticks_seconds2 = [((ts - start_time2) // plot_window) * plot_window for ts in ticks2]
 
-print("max memory")
-print(len(ticks_seconds2))
 
 plt.xticks(ticks2, ticks_seconds2)
 plt.xlabel('Time (seconds)')
@@ -150,16 +147,16 @@ plt.legend()
 
 lastEl = ticks_seconds2[-1]
 
-plt.subplot(5, 1, 3)
+plt.subplot(6, 1, 3)
 
 resultat = ticks_seconds2[3:]
 
-plot_path = "../Load/17-06-2024/"
+plot_path = "../Load/25-06-2024/"
 
 test = 0
 
 try:
-    df = pd.read_csv(plot_path + 'outputMassiveLoad-15-06-24.csv')
+    df = pd.read_csv(plot_path + 'output-3minutes-70requests.csv')
 except FileNotFoundError:
     #print(f"Le fichier {file_name} n'a pas été trouvé dans le chemin {plot_path}")
     # Vous pouvez également faire d'autres traitements ici, comme retourner un DataFrame vide
@@ -189,8 +186,8 @@ df['Target Time'] = df['Target Time'].astype(int)
 
 # Votre code pour créer le graphique
 line1, = plt.plot(df['Target Time'], df['Load Intensity'])
-line2, = plt.plot(df['Target Time'], df['Successful Transactions'])
-# line3, = plt.plot(df['Target Time'], df['Failed Transactions'])
+line2, = plt.plot(df['Target Time'], df['Successful Transactions'], color='green')
+line3, = plt.plot(df['Target Time'], df['Failed Transactions'], color='red')
 # line4, = plt.plot(df['Target Time'], df['Dropped Transactions'])
 
 # Définition des emplacements des marqueurs d'axe personnalisés
@@ -198,11 +195,11 @@ interval = plot_window
 plt.xticks(np.arange(min(df['Target Time']), max(df['Target Time']) + 1, interval))
 plt.xticks(rotation=45)
 #plt.legend([line1, line2, line3, line4], ['Load Intensity', 'Successful Transactions', 'Failed Transactions', 'Dropped Transactions'])
-plt.legend([line1, line2, ], ['Load Intensity', 'Successful Transactions'])
+plt.legend([line1, line2, line3,], ['Load Intensity', 'Successful Transactions', 'Failed Transactions'])
 plt.xlabel('Time (seconds)')
 plt.ylabel('Number of requests')
 
-plt.subplot(5, 1, 4)
+plt.subplot(6, 1, 4)
 all_timestamps3 = []
 # Read JSON data from a file
 directory3 = save_path + 'pod_info/pod_info.json'
@@ -251,7 +248,7 @@ plt.xticks(rotation=45)
 plt.legend()
 
 # Plot the second set of data
-plt.subplot(5, 1, 5)
+plt.subplot(6, 1, 5)
 directory3 = save_path + 'aggregation/aggregation.json'
 
 with open(directory3, 'r') as file:
@@ -290,7 +287,48 @@ plt.xlabel('Time (seconds)')
 plt.ylabel('Core per seconds')
 plt.title('CPU consumption in aggregate')
 plt.xticks(rotation=45)
-#plt.legend()
+plt.legend()
+
+plt.subplot(6, 1, 6)
+directory3 = save_path + 'aggregation/aggregation_memory.json'
+
+with open(directory3, 'r') as file:
+    source = json.load(file)
+
+timestamps = []
+values = []
+tab = []
+
+data_list = source['data']['result']
+
+for json_data in data_list:
+    # Convertir la chaîne JSON en un dictionnaire Python
+    result = json_data
+
+    # Extraire les valeurs et les timestamps
+    timestamps = [float(x[0]) for x in result["values"]]
+    values = [float(x[1]) for x in result["values"]]
+
+    # Récupérer le nom de la métrique et du déploiement
+    metric_name = result["metric"]["container"]
+    deployment_name = result["metric"]["container"]
+
+    # Tracer la courbe
+    plt.plot(timestamps, values, label=f"{deployment_name}")
+
+start_time5 = min(timestamps)
+end_time5 = max(timestamps)
+
+ticks5 = np.arange(start_time5, end_time5 + 1, plot_window)
+
+ticks_seconds5 = [((ts - start_time5) // plot_window) * plot_window for ts in ticks5]
+
+plt.xticks(ticks5, ticks_seconds5)
+plt.xlabel('Time (seconds)')
+plt.ylabel('Memory GB')
+plt.title('Memory usage in aggregate')
+plt.xticks(rotation=45)
+plt.legend()
 
 plt.tight_layout()
 

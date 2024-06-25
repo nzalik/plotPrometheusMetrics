@@ -1,0 +1,13 @@
+SUr 5minutes
+
+data_14-09 pour 150 requests
+
+data_15-08 pour 180
+
+Sur 10 minutes
+150 requests data_16-12
+100 requests data_17-45
+
+Avec HPA
+
+

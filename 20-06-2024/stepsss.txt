@@ -1,0 +1,30 @@
+---------------------------------------------
+DEPLOYMENT 1
+---------------------------------------------
+
+data_14-23
+reduction de la charge à 50 sur trois minutes avec nouvelle forme de genération et repeat many values
+
+data_14-48 pour voir comment ca se passe avec une charge jusqua 30
+
+data_15-27 30 request sur 3 minutes bis
+
+data_15-49 25 request sur 3 minutes bis
+
+Up on dahu 21 et 11
+
+-------------------------------------------------
+DEPLOYMENT 2 Pas de place je retourne sur économe
+-------------------------------------------------
+
+Faire un warmup et attendre avant de lancer la vraie charge
+
+data_17-30 marche avec la charge sur 3 minutes jusqu'à 25 requests
+A
+data_18-34 c'est sans scaling sur econome
+
+limit pour le scaling a data_20-52
+
+
+
+

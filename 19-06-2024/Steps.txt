@@ -1,0 +1,56 @@
+INjection de 3minutes
+
+data12-38
+
+data_13-52
+injection bis de 3minutes et recup sur 7minute
+
+data_13_57
+recup sur 10 minutes
+
+data_13-57
+recuperation sur 10 minutes aprs debut de l'injection
+
+Injection de 2 min
+
+data_13-14 c'est les données pour
+3 minutes après l'injection
+
+On passe à 4minutes pour voir
+data_13-14 données
+5 minutes après l'injection
+
+
+----------------------
+
+data17-48 injection sur 2 minutes
+
+data_18-12 injection sur 3 minutes
+
+data_18-27 injection 2 minutes avec recopie trois de chaque valeur de requete
+
+
+data_18-54 marche parfaietement je veux confirmer cela avec un nouveau test
+
+data_19-10 confirme pour des requetsa llant jusqua 79
+
+data_19-28 je passe à 240 minutes pour un total de 120 requetes ce qui exploses le trucs
+
+data_19-47 on passe à 100 requetes sur 4 minutes mais toujours explosions
+
+data_20-09 c'est pour faire le tsst sur 3min et 100 requetes
+
+
+-------------------------------------------
+20-06-2024
+-------------------------------------------
+
+
+
+
+-----------------------------------------
+AUTOSCALER
+-----------------------------------------
+
+
+
